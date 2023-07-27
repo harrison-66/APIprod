@@ -1,0 +1,214 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Osu!API
+{% endblock %}
+
+{% block main %}
+    <div>
+        <div class="split-sides-container d-flex justify-content-center">
+            <div class="left-side-col">
+                <h2>Stat Tracker</h2>
+                <div class="container" id="profile-container" style="display: none;">
+                    <div class="row profile-header mb-1">
+                    <div class="col-2">
+                        <img id="profile-avatar" class="profile-avatar glow" src="AVATAR_URL_HERE" alt="Avatar" style="border-radius: 5px;">
+                    </div>
+                    <div class="col-8">
+                        <h3 class="profile-username" id="username">USERNAME_HERE</h3>
+                    </div>
+                    <div class="col-2">
+                        <div class="accuracy-box" id="accuracy-box"></div>
+                    </div>
+                    </div>
+                    <div class="row profile-stats">
+                    <div class="col-sm">
+                        <h6 class="card-header">PP</h6>
+                        <div class="card">
+                        <div class="card-body">
+                            <p class="card-text light-mode" id="pp_raw">PP_HERE</p>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <h6 class="card-header">Rank</h6>
+                        <div class="card">
+                        <div class="card-body">
+                            <p class="card-text light-mode" id="pp_rank">RANK_HERE</p>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <h6 class="card-header">Playcount</h6>
+                        <div class="card">
+                        <div class="card-body">
+                            <p class="card-text light-mode" id="playcount">PLAYCOUNT_HERE</p>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <h6 class="card-header">Playtime(hrs)</h6>
+                        <div class="card">
+                        <div class="card-body">
+                            <p class="card-text light-mode" id="total_seconds_played">HRS_PLAYED_HERE</p>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <h6 class="card-header">Level</h6>
+                        <div class="card">
+                        <div class="card-body">
+                            <p class="card-text light-mode" id="level">LEVEL_HERE</p>
+                        </div>
+                        </div>
+                    </div>
+                    <!---end of stats-->
+                    </div>
+                    <h4 class="my-1">Top Scores</h4>
+                    <div class="row profile-recent-activity">
+                        <div id="score-container">
+
+                        </div>
+                    </div>
+                </div>
+                <form action="/osu-api-1" method="POST" id="form">
+                    <input class="mb-2" type="text" name="username" id="name" autocomplete="off" placeholder="Enter a osu! username">
+                    <button id="button1" class="styled-button">Pull User Data</button>
+                </form>
+            </div>
+
+            <div class="right-side-col">
+                <h2>Recent Ranked Maps</h2>
+                <div id="recently-ranked-maps" class="card-columns mb-3">
+                    <!-- Map data will be dynamically inserted here -->
+                </div>
+                <form action="/osu-api-2" method="POST">
+                    <button id="button2" class="styled-button">Pull Recent Ranked Maps</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <script>
+        var apiKey = "{{api_key}}";
+        document.getElementById('button1').addEventListener('click', function(e) {
+            e.preventDefault();
+            var username = document.getElementById('name').value;
+            fetch('/osu-api-1', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const accuracy = Math.round(data.accuracy*100)/100;
+                const accuracyBox = document.querySelector('.accuracy-box');
+                document.getElementById('username').innerHTML = data.username;
+                document.getElementById('playcount').innerHTML = data.playcount;
+                document.getElementById('pp_rank').innerHTML = data.pp_rank;
+                document.getElementById('pp_raw').innerHTML = data.pp_raw;
+                document.getElementById('total_seconds_played').innerHTML = Math.round(((data.total_seconds_played)/3600)*100)/100;
+                document.getElementById('level').innerHTML = Math.round(data.level*100)/100;
+                document.getElementById('profile-container').style.display = 'block';
+                document.getElementById('profile-avatar').src = 'http://s.ppy.sh/a/' + data.user_id;
+                document.getElementById('accuracy-box').innerHTML = accuracy;
+                accuracyBox.classList.remove('green', 'yellow', 'red');
+                if (accuracy >= 97) {
+                    accuracyBox.classList.add('green');
+                } else if(accuracy >= 94) {
+                    accuracyBox.classList.add('yellow');
+                } else {
+                    accuracyBox.classList.add('red');
+                }
+                const user = data.username;
+                fetch(`https://osu.ppy.sh/api/get_user_best?k=${apiKey}&u=${user}&limit=20`)
+                .then(response => response.json())
+                .then(scores => {
+                    const scoreContainer = document.getElementById('score-container');
+                    scoreContainer.innerHTML = '';
+                    for (let i = 0; i < scores.length; i++) {
+                        setTimeout(() => {
+                            const score = scores[i];
+                            fetch(`https://osu.ppy.sh/api/get_beatmaps?k=${apiKey}&b=${score.beatmap_id}`)
+                            .then(response => response.json())
+                            .then(beatmaps => {
+                                const beatmap = beatmaps[0];
+                                const scoreElement = document.createElement('div');
+                                scoreElement.innerHTML = `
+                                    <div class="card mb-1 mx-auto light-mode" style="width: 40rem;">
+                                        <img src="https://assets.ppy.sh/beatmaps/${ beatmap.beatmapset_id }/covers/cover.jpg" class="card-img-top" alt="...">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${ beatmap.title } (${ beatmap.version }) - <i class="font-italic">${ beatmap.artist }</i></h5>
+                                            <p class="card-text">PP: ${ score.pp }  |  Rank: ${score.rank}</p>
+                                            <p class="card-text">Stars: ${ beatmap.difficultyrating }</p>
+                                        </div>
+                                    </div>
+                                `;
+                                scoreContainer.appendChild(scoreElement);
+                            });
+                        }, i * 25);
+                    }
+                });
+            });
+        });
+
+
+        let contentLoaded = false;
+        document.getElementById('button2').addEventListener('click', function(f) {
+            f.preventDefault();
+            if (contentLoaded) {
+                return;
+            }
+            fetch('/osu-api-2', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const mapContainer = document.getElementById('recently-ranked-maps');
+                const beatmapsBySet = data.reduce((groups, map) => {
+                    (groups[map.beatmapset_id] = groups[map.beatmapset_id] || []).push(map);
+                    return groups;
+                }, {});
+                for (let [beatmapsetId, beatmaps] of Object.entries(beatmapsBySet)) {
+                    const artist = beatmaps[0].artist;
+                    const title = beatmaps[0].title;
+                    const songLength = beatmaps[0].hit_length;
+                    const minutes = Math.floor(songLength / 60);
+                    let seconds = songLength % 60;
+                    if (seconds < 10) {
+                        seconds = seconds.toString().padStart(2, '0');
+                    }
+                    const setElement = document.createElement('div');
+                    let beatmapInfo = '';
+                    for (let beatmap of beatmaps) {
+                        beatmapInfo += `<p>${beatmap.version}: ${Number(beatmap.difficultyrating).toFixed(2)} Stars</p>`;
+                    }
+                    setElement.innerHTML = `
+                        <div class="card bmlist mb-1 light-mode">
+                            <img src="https://assets.ppy.sh/beatmaps/${beatmapsetId}/covers/cover.jpg" alt="thumbnail" class="card-bg-image">
+                            <div class="card-body">
+                                <h3 class="card-title"><a href="https://osu.ppy.sh/beatmapsets/${beatmapsetId}" target="_blank" rel="noopener noreferrer" class="card-link noline">${title}</a> - <i class="font-italic">${artist}</i></h3>
+                                <h5 class="card-text mb-3">Length: ${minutes}:${seconds}</h5>
+                                ${beatmapInfo}
+                            </div>
+                        </div>
+                    `;
+                    mapContainer.appendChild(setElement);
+                }
+            });
+            contentLoaded = true;
+        });
+    </script>
+
+
+{% endblock %}

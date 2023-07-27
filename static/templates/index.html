@@ -1,0 +1,117 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block main %}
+    <style>
+    li {
+        position: relative;
+    }
+    .leader-line li::before {
+        content: "";
+        border-bottom: 1px dotted black;
+        position: absolute;
+        left: 30%;
+        right: 15%;
+        top: 45%;
+        transform: translateY(-50%);
+    }
+    .gray-bg {
+        background-color: #e9ecef;
+        padding: 1rem 2rem 3rem;
+        border-radius: 5px;
+    }
+    </style>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="jumbotron gray-bg light-mode mb-3">
+                    <h2 class="display-4">APIprod - API querying and encrypted key storage</h2>
+                    <p class="lead">Welcome to my Final Project for CS50!</p>
+                    <hr class="my-4">
+                    <p>The purpose of this application is twofold: first, to highlight the power of API's and just a fraction of their use cases for standard users; and second, to learn how to use a variety of APIs, and to attempt to universalize API calling.</p>
+                </div>
+                <h3>Check out some API applications hosted within the site:</h3>
+                <div class="container mt-3">
+                    <div class="row light-mode">
+                        <div class="col">
+                            <div class="card" >
+                                <img class="card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Osu%21_Logo_2016.svg/512px-Osu%21_Logo_2016.svg.png" alt="Osu! logo">
+                                <div class="card-body">
+                                    <h5 class="card-title">Osu! API</h5>
+                                    <p class="card-text">A simple stat tracker, which can lookup recent ranked maps, highlighting the use of APIs for querying data.</p>
+                                    <a href="/osu" class="btn btn-primary">Osu! Page</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card">
+                                <img class="card-img-top" src="/static/OpenAI-2.png" alt="OpenAI logo">
+                                <div class="card-body">
+                                    <h5 class="card-title">OpenAI API</h5>
+                                    <p class="card-text">Use Artificial Intelligence to help complete text, generate images and more; demonstrating how APIs can process user inputs.</p>
+                                </div>
+                                <div class="card-body">
+                                    <a href="/completions" class="btn btn-primary btn-sm mb-1">Completions</a>
+                                    <a href="/chatbot" class="btn btn-primary btn-sm mb-1">Chatbot</a>
+                                    <a href="/summary" class="btn btn-primary btn-sm">Summarizer</a>
+                                    <a href="/generate_image" class="btn btn-primary btn-sm">Image Generation</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card">
+                                <img class="card-img-top" src="/static/programmer.jpg" alt="Osu! logo">
+                                <div class="card-body">
+                                    <h5 class="card-title">Any API!</h5>
+                                    <p class="card-text">Query an API using your key and endpoint! Start by adding a key to your account on the right, then go to the AnyAPI page.</p>
+                                    <a href="/any-api" class="btn btn-primary">Any API!</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="alert alert-info" role="alert">
+                    API keys are encrypted before being stored-- still use at your own risk.
+                  </div>
+                <div class="mb-3" style="border-width:3px; border-style:solid; border-color:black; border-radius: 5px;">
+                    <h3>Add a New API Key:</h3>
+                    <form method="POST" action="/new-key">
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" name="name">
+                        <br>
+                        <label for="key">Key:</label>
+                        <input type="text" id="key" name="key">
+                        <br>
+                        <input type="submit" value="Submit" class="styled-button mb-1">
+                    </form>
+                </div>
+
+                <div style="border-width:3px; border-style:solid; border-color:black; border-radius: 5px;">
+                    <ul class="nopad leader-line">
+                        <h3>Saved API Keys:</h3>
+                        {% for key_name in key_names %}
+                            <form method="POST" action="/delete-key" class="mb-2 mx-1">
+                                <li style="list-style: none; display: flex; width: 100%; justify-content: space-between;">
+                                    <span class="first">{{ key_name }}</span>
+                                    <span class="second">
+                                        <input type="hidden" name="key_name" value="{{ key_name }}">
+                                        <input type="submit" value="Delete" class="btn btn-danger btn-sm">
+                                    </span>
+                                </li>
+                            </form>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+{% endblock %}

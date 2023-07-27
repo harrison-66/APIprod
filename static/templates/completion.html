@@ -1,0 +1,28 @@
+
+{% extends "layout.html" %}
+
+{% block title %}
+    Complete Text
+{% endblock %}
+
+{% block main %}
+    <div class="mb-3 mx-2">
+      <label for="text-box" class="form-label ms-2">Text to Complete:</label>
+      <textarea type="text" class="form-control" name="text-box" id="text-box" rows="20" placeholder="Enter text here..."></textarea>
+    </div>
+    <button class="btn btn-primary ms-2 leftaligned styled-button" onclick="sendAjaxRequest()">Complete</button>
+  <script>
+    function sendAjaxRequest() {
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+          document.getElementById('text-box').value = xhr.responseText;
+        }
+      }
+      xhr.open('POST', '/completions', true);
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      xhr.send('text=' + encodeURIComponent(document.getElementById('text-box').value));
+    }
+  </script>
+{% endblock %}
+

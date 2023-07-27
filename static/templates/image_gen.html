@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Generate an Image
+{% endblock %}
+
+{% block main %}
+    <div class="mb-3" id="image-div">
+        <img src="/static/blank_image.png" class="limheight" style="border:dashed 2px #1c1c1c;">
+    </div>
+    <form id="image-form">
+        <textarea class="mb-2" type="text" name="prompt" id="prompt-input" cols="120" rows="2" placeholder="Write a prompt for your image to be generated around..."></textarea>
+        <button type="submit" id="submit-button">Generate New Image</button>
+    </form>
+
+    <script>
+        document.getElementById("image-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const prompt = document.getElementById("prompt-input").value;
+            const url = "/generate_image";
+            const data = {prompt: prompt};
+            fetch(url, {
+                method: "POST",
+                body: JSON.stringify(data),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const imageUrl = data.image_url;
+                const imageDiv = document.getElementById("image-div");
+                imageDiv.innerHTML = `<img src="${imageUrl}" id="image" style="border:dashed 2px #1c1c1c;">`;
+            });
+        });
+
+
+    </script>
+{% endblock %}

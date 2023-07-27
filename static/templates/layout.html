@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="initial-scale=1, width=device-width">
+        <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" rel="stylesheet">
+        <script crossorigin="anonymous" src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"></script>
+        <link href="/static/styles.css" rel="stylesheet">
+
+        <title>HGPT: {% block title %}{% endblock %}</title>
+        <style>
+            body {
+                color: black;
+                background-color: white;
+            }
+            body.dark-mode {
+                color: white;
+                background-color: #333;
+            }
+        </style>
+    </head>
+    <body>
+        <nav class="bg-secondary navbar navbar-expand-md navbar-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/"><span class="green">API</span><span class="gold">prod</span></a>
+                <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbar">
+                    {% if session["user_id"] %}
+                        <ul class="navbar-nav me-auto mt-2">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Artificial Intelligence</a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <li class="nav-item"><a class="nav-link" href="/completions">Complete Text</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="/summary">Summarize Text</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="/chatbot">Chatbot</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li class="nav-item"><a class="nav-link" href="/generate_image">Image Generation</a></li>
+                                </ul>
+                            <li class="nav-item ps-1"><a class="nav-link" href="#">|</a></li>
+                            <li class="nav-item ps-1"><a class="nav-link" href="/osu">Osu!</a></li>
+                            <li class="nav-item ps-1"><a class="nav-link" href="#">|</a></li>
+                            <li class="nav-item ps-1"><a class="nav-link" href="/any-api">Any API</a></li>
+                        </ul>
+                        <ul class="navbar-nav ms-auto mt-2">
+                            <button class="dark-toggle me-1" id="dark-mode-toggle">Toggle Dark</button>
+                            <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
+                        </ul>
+                    {% else %}
+                        <ul class="navbar-nav ms-auto mt-2">
+                            <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/login">Log In</a></li>
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+
+        <main class="container-fluid py-5 text-center">
+            {% block main %}{% endblock %}
+        </main>
+        <footer class="small text-center text-muted" style="background-color: #d3d3d3;">
+            Artificial Intelligence API provided by <a href="https://iexcloud.io/">OpenAI</a> || Osu! API provided by <a href="https://osu.ppy.sh/">Peppy</a>
+        </footer>
+        <script>
+            const toggleButton = document.getElementById('dark-mode-toggle');
+            toggleButton.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Summarize a Text
+{% endblock %}
+
+{% block main %}
+    <form action="/summary" method="post" id="summform">
+        <div class="mb-3">
+            <label for="tosumm" class="form-label ms-2">Text to Summarize:</label>
+            <textarea class="form-control mx-1" name="tosumm" cols="180" rows="16" placeholder="Enter text here..."></textarea>
+        </div>
+        <button class="btn btn-primary ms-2 leftaligned" type="submit">Submit!</button>
+    </form>
+
+{% endblock %}
+

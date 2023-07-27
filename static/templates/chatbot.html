@@ -1,0 +1,80 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Chatbot
+{% endblock %}
+
+{% block main %}
+    <div id="chatbot-container">
+        <div id="chatbot-header" class="glow">
+            <h1>Chatbot</h1>
+        </div>
+        <div id="chatbot-messages" class="light-mode glow">
+        <!-- Messages will be added here -->
+        </div>
+        <div id="chatbot-input" class="glow">
+            <form id="chatbot-form">
+                <div>
+                    <textarea type="text" id="chatbot-text-input" autocomplete="off" cols="50" rows="1" placeholder="Enter your message..." style="resize: none; border:dashed 2px blue; vertical-align: top;"></textarea>
+                    <button type="submit">Send</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        // Get a reference to the chatbot-messages element
+        const messagesContainer = document.querySelector("#chatbot-messages");
+
+        // Add a function to append a new message to the messages container
+        function addMessage(text, sender) {
+        // Create a new div element to hold the message
+            const messageElement = document.createElement("div");
+
+        // Set the class of the message element based on the sender
+            if (sender === "user") {
+                messageElement.classList.add("user-message");
+            } else {
+                messageElement.classList.add("chatbot-message");
+            }
+
+        // Set the inner text of the message element to the message text
+            messageElement.innerText = text;
+
+        // Append the message element to the messages container
+            messagesContainer.appendChild(messageElement);
+
+        // Scroll the messages container to the bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Add an event listener to the chatbot-form to handle form submissions
+        const form = document.querySelector("#chatbot-form");
+        form.addEventListener("submit", event => {
+        // Prevent the default form submission behavior
+            event.preventDefault();
+
+        // Get the value of the chatbot-text-input element
+            const input = document.querySelector("#chatbot-text-input");
+            const text = input.value;
+
+        // Add the user's message to the messages container
+            addMessage(text, "user");
+
+        // Clear the value of the chatbot-text-input element
+            input.value = "";
+
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/chatbot");
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onload = function() {
+    // Parse the response from the server
+                const response = JSON.parse(xhr.responseText);
+
+    // Add the chatbot's response to the messages container
+                addMessage(response.response, "chatbot");
+            };
+            xhr.send(`message=${text}`);
+        });
+    </script>
+
+{% endblock %}

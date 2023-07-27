@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Summarize a Text
+{% endblock %}
+
+{% block main %}
+    <div class="summary-container">
+        <div class="summary-header">
+            <h1 class="summary-title">Summary</h1>
+            <button id="copy-button" class="styled-button">Copy Summary</button>
+        </div>
+        <textarea class="summary-text" style="resize: none;" rows="16" readonly>{{ summ }}</textarea>
+    </div>
+    <div class="alert alert-warning mt-1" role="alert">
+        The API limits response length - if your summary seems cut-off, try pasting the summary into the <a href="/completions" class="alert-link">Completions</a> page.
+    </div>
+    <script>
+        function copySummary() {
+            var summaryText = document.querySelector('.summary-text');
+            summaryText.select();
+            document.execCommand('copy');
+        }
+        var copyButton = document.querySelector('#copy-button');
+        copyButton.addEventListener('click', copySummary);
+    </script>
+
+{% endblock %}
+

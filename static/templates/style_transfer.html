@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Style Transfer
+{% endblock %}
+
+{% block main %}
+    <form id="image-form">
+        <input type="file" accept="image/png, image/jpg" id="photo">
+        <textarea type="text" id="prompt"></textarea>
+        <button type="submit" id="submit-button">Transfer</button>
+    </form>
+    <div id="image-container"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('submit-button').addEventListener('click', function(e) {
+                e.preventDefault();
+                var photo = document.getElementById('photo').files[0];
+                var prompt = document.getElementById('prompt').value;
+                var formData = new FormData();
+                formData.append('photo', photo);
+                formData.append('prompt', prompt);
+                var xhr = new XMLHttpRequest();
+                console.log(xhr); 
+                xhr.open('POST', '/style_transfer');
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        document.getElementById('image-container').innerHTML = '<img src="' + xhr.responseText + '">';
+                    } else {
+                        var errorMessage = 'An error occurred';
+                        try {
+                            var response = JSON.parse(xhr.responseText);
+                            if (response.hasOwnProperty('error')) {
+                                errorMessage = response.error;
+                            }
+                        } catch (e) {
+
+                        }
+                        document.getElementById('image-container').innerHTML = errorMessage;
+                    }
+                };
+                xhr.send(formData);
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Query an API
+{% endblock %}
+
+{% block main %}
+    <div class="alert alert-warning" role="alert">
+        Use the "GET" path at your own risk! Your (unencrypted) API key will be included on your client side as well as in server logs!
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <form action="/api_query" method="post">
+                    <div class="form-group">
+                        <label for="http_method">HTTP Method:</label><br>
+                        <select name="http_method" id="http_method">
+                            <option value="get">GET</option>
+                            <option value="post">POST</option>
+                            <option value="get_params">GET (key in params)</option>
+                            <option value="no_data">GET (NO PARAMS)</option>
+                        </select><br>
+                    </div>
+                    <div class="form-group">
+                        <label for="api_key">API Key:</label><br>
+                        <select name="api_key" id="api_key">
+                        {% for key in key_names %}
+                            <option value="{{ key }}">{{ key }}</option>
+                        {% endfor %}
+                        </select><br>
+                        <label for="key_param">Key Parameter (k, key, token...):</label><br>
+                        <input type="text" id="key_param" name="key_param" value="Authorization"><br>
+                    </div>
+                    <div class="form-group">
+                        <label for="endpoint">Endpoint:</label><br>
+                        <input type="text" id="endpoint" name="endpoint" required><br>
+                    </div>
+                    <div class="form-group">
+                        <label for="params">Params:</label><br>
+                        <textarea type="text" id="params" rows="1" cols="40" name="params" style="resize: none;"></textarea><br>
+                    </div>
+                    <div class="form-group mb-1">
+                        <label for="data">Data:</label><br>
+                        <textarea type="text" id="data" rows="1" cols="40" name="data" style="resize: none;"></textarea><br>
+                    </div>
+                    <input type="submit" value="Submit" class="styled-button">
+                </form>
+            </div>
+            <div class="col-md-6">
+                <div class="container">
+                    <div class="alert alert-info">
+                        <h4 class="alert-heading">Important Information</h4>
+                        <p>Consult your API's documentation before using.</p>
+                        <hr>
+                        <p>Key Parameter will be passed as the key for wherever the API key ends up. (for POST, typically Authorization, and for GET with params, it's usually k, or key.)</p>
+                        <p>Ensure your endpoint is the full url; including the https tag!</p>
+                        <p>Params or data should be passed as key-value pairs, with no additional spaces or quotation marks. (ex: key1:value1,key2:value2...)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var httpMethod = document.getElementById("http_method");
+        var paramsInput = document.getElementById("params");
+        var dataInput = document.getElementById("data");
+        var apiInput = document.getElementById("api_key");
+        var keyParam = document.getElementById("key_param");
+        httpMethod.addEventListener("change", function() {
+            if (httpMethod.value == "get") {
+                paramsInput.disabled = false;
+                keyParam.disabled = false;
+                dataInput.disabled = true;
+                apiInput.disabled = false;
+            } else if (httpMethod.value == "post") {
+                paramsInput.disabled = true;
+                keyParam.disabled = false;
+                dataInput.disabled = false;
+                apiInput.disabled = false;
+            } else if (httpMethod.value == "get_params") {
+                paramsInput.disabled = false;
+                keyParam.disabled = true;
+                dataInput.disabled = true;
+                apiInput.disabled = true;
+            } else if (httpMethod.value == "no_data") {
+                paramsInput.disabled = true;
+                keyParam.disabled = true;
+                dataInput.disabled = true;
+                apiInput.disabled = true;
+            }
+        });
+    </script>
+
+{% endblock %}
